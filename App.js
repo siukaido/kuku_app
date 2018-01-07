@@ -1,57 +1,78 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
-
 import React, { Component } from 'react';
-import {
-  Platform,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native';
+import { Row, Grid } from "react-native-easy-grid";
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' +
-    'Cmd+D or shake for dev menu',
-  android: 'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
+import NumericKeypad from './src/components/NumericKeypad';
+import Display from './src/components/Display';
 
 export default class App extends Component<{}> {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      inputNum:     '',
+      leftOperand:  this.randomNum(),
+      rightOperand: this.randomNum()
+    };
+  }
+
+  _onPress = (inputNum) => {
+    let stateNum = this.state.inputNum;
+    if (parseInt(stateNum, 10) === 0) {
+      stateNum = inputNum;
+    } else {
+      stateNum += inputNum;
+    }
+    this.setState({ inputNum: stateNum });
+  }
+
+  _onDelete = () => {
+    this.setState({ inputNum: '' });
+  }
+
+  _onEnter = () => {
+    const is_correct = this.isCorrect();
+    if (is_correct) {
+      alert('正解');
+    } else {
+      alert('間違い');
+    }
+
+    this.setState({
+      inputNum:     '',
+      leftOperand:  this.randomNum(),
+      rightOperand: this.randomNum()
+    });
+  }
+
+  randomNum() {
+    const MinNum = 1;
+    const MaxNum = 9;
+    return Math.floor(Math.random() * (MaxNum + 1 - MinNum)) + MinNum;
+  }
+
+  isCorrect() {
+    const answer = this.state.leftOperand * this.state.rightOperand;
+    return parseInt(answer, 10) === parseInt(this.state.inputNum, 10);
+  }
+
   render() {
     return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit App.js
-        </Text>
-        <Text style={styles.instructions}>
-          {instructions}
-        </Text>
-      </View>
+      <Grid>
+        <Row>
+          <Display
+            leftOperand={this.state.leftOperand}
+            rightOperand={this.state.rightOperand}
+            inputNum={this.state.inputNum}
+          />
+        </Row>
+        <Row>
+          <NumericKeypad
+            onPress={this._onPress}
+            onEnter={this._onEnter}
+            onDelete={this._onDelete}
+          />
+        </Row>
+      </Grid>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-});

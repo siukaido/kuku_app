@@ -7,8 +7,10 @@
     "test": "jest"
   },
   "dependencies": {
+    "apsl-react-native-button": "^3.1.0",
     "react": "16.0.0",
-    "react-native": "0.51.0"
+    "react-native": "0.51.0",
+    "react-native-easy-grid": "^0.1.16"
   },
   "devDependencies": {
     "babel-jest": "22.0.4",
