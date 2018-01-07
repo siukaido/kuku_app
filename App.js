@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
-import { Row, Grid } from "react-native-easy-grid";
+import { FlatList } from 'react-native';
+import { Grid, Row } from "react-native-easy-grid";
 
-import NumericKeypad from './src/components/NumericKeypad';
 import Display from './src/components/Display';
+import NumericKeypad from './src/components/NumericKeypad';
+import Histories from './src/components/Histories';
 
 export default class App extends Component<{}> {
   constructor(props) {
@@ -11,7 +13,8 @@ export default class App extends Component<{}> {
     this.state = {
       inputNum:     '',
       leftOperand:  this.randomNum(),
-      rightOperand: this.randomNum()
+      rightOperand: this.randomNum(),
+      histories:    []
     };
   }
 
@@ -30,17 +33,27 @@ export default class App extends Component<{}> {
   }
 
   _onEnter = () => {
-    const is_correct = this.isCorrect();
-    if (is_correct) {
+    const isCorrect = this.isCorrect();
+    if (isCorrect) {
       alert('正解');
     } else {
       alert('間違い');
     }
 
+    const histories = [].concat(this.state.histories);
+    histories.unshift({
+      key: histories.length + 1,
+      inputNum: this.state.inputNum,
+      leftOperand: this.state.leftOperand,
+      rightOperand: this.state.rightOperand,
+      isCorrect: isCorrect
+    });
+
     this.setState({
       inputNum:     '',
       leftOperand:  this.randomNum(),
-      rightOperand: this.randomNum()
+      rightOperand: this.randomNum(),
+      histories:    histories
     });
   }
 
@@ -58,14 +71,20 @@ export default class App extends Component<{}> {
   render() {
     return (
       <Grid>
-        <Row>
+        <Row size={1}>
           <Display
             leftOperand={this.state.leftOperand}
             rightOperand={this.state.rightOperand}
             inputNum={this.state.inputNum}
           />
         </Row>
-        <Row>
+        <Row size={2}>
+          <FlatList
+            data={this.state.histories}
+            renderItem={({item}) => <Histories item={item} /> }
+            />
+        </Row>
+        <Row size={3}>
           <NumericKeypad
             onPress={this._onPress}
             onEnter={this._onEnter}
